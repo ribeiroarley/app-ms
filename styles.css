@@ -1,0 +1,459 @@
+/* =================================
+   VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
+   ================================= */
+:root {
+  /* Cores principais (ajustadas para melhor contraste) */
+  --verde-mega: #209869;
+  --verde-escuro: #176e4d;
+  --laranja: #FF6B35;
+  --laranja-escuro: #E94F37;
+  --branco: #ffffff;
+  --preto: #2D2D2D;
+  --cinza-claro: #f8f9fa;
+  --cinza-medio: #e9ecef;
+  --cinza-texto: #4A4A4A;
+  --cinza-border: #DEDEDE;
+  --vermelho-erro: #E74C3C;
+  --azul-info: #3498db;
+
+  /* Novas cores para estados */
+  --sucesso: #27AE60;
+  --aviso: #F39C12;
+  --erro: #E74C3C;
+  --info: #3498DB;
+
+  /* Efeitos visuais atualizados */
+  --sombra: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --sombra-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --sombra-focus: 0 0 0 3px rgba(32, 152, 105, 0.35);
+  --borda: 1px solid var(--cinza-border);
+  --radius: 8px;
+  
+  /* Transições */
+  --transicao-rapida: all 0.15s ease;
+  --transicao-normal: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ====================
+   RESET E ESTILOS BASE 
+   ==================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: var(--cinza-texto);
+  background-color: var(--cinza-claro);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+/* ================
+   LAYOUT PRINCIPAL
+   ================ */
+.container {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--branco);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  padding: 2rem;
+  margin: auto;
+  transition: var(--transicao-normal);
+}
+
+/* =========
+   CABEÇALHO
+   ========== */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+h1 {
+  color: var(--verde-mega);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.tagline {
+  color: var(--cinza-texto);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+h2 {
+  color: var(--verde-escuro);
+  font-size: 1.4rem;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+}
+
+/* ================
+   ALERTAS E AVISOS 
+   ================ */
+.alert-container {
+  margin: 1rem 0;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.alert::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.alert-info {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid var(--info);
+  color: var(--cinza-texto);
+}
+
+.alert-info::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233498db'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+}
+
+.alert-warning {
+  background-color: rgba(243, 156, 18, 0.1);
+  border-left: 4px solid var(--aviso);
+  color: var(--cinza-texto);
+}
+
+.alert-warning::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f39c12'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E");
+}
+
+.alert-error {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid var(--erro);
+  color: var(--cinza-texto);
+}
+
+.alert-error::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e74c3c'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E");
+}
+
+/* =======================
+   CONTROLES DO FORMULÁRIO
+   ======================= */
+.controls {
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.form-group {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--verde-escuro);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.form-control {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--cinza-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  width: 80px;
+  text-align: center;
+  transition: var(--transicao-rapida);
+  background-color: var(--branco);
+  font-weight: 600;
+  color: var(--verde-escuro);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--verde-mega);
+  box-shadow: var(--sombra-focus);
+}
+
+.form-text {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--cinza-texto);
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+/* ======
+   BOTÕES
+   ====== */
+.btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transicao-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--verde-mega);
+  color: var(--branco);
+}
+
+.btn-primary:hover {
+  background-color: var(--verde-escuro);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-hover);
+}
+
+.btn-secondary {
+  background-color: var(--cinza-medio);
+  color: var(--cinza-texto);
+}
+
+.btn-secondary:hover {
+  background-color: var(--cinza-border);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-hover);
+}
+
+/* ==========
+   RESULTADOS 
+   ========== */
+.results {
+  margin-top: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.jogos-container {
+  background-color: var(--cinza-claro);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: var(--borda);
+  min-height: 200px;
+}
+
+.jogo {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--branco);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  transition: var(--transicao-normal);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.jogo:last-child {
+  margin-bottom: 0;
+}
+
+.jogo i {
+  color: var(--verde-mega);
+  font-weight: 700;
+  font-style: normal;
+  min-width: 24px;
+}
+
+/* Bolas dos números - estilos */
+.jogo span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: var(--transicao-normal);
+}
+
+.jogo .nao-sorteado {
+  background: linear-gradient(135deg, var(--laranja), var(--laranja-escuro));
+  color: var(--branco);
+}
+
+.jogo .sorteado {
+  background: linear-gradient(135deg, var(--verde-mega), var(--verde-escuro));
+  color: var(--branco);
+}
+
+/* ======
+   RODAPÉ
+   ====== */
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  animation: fadeIn 0.7s ease-out;
+}
+
+.footer-content {
+  padding-top: 1.5rem;
+  border-top: var(--borda);
+}
+
+.copy {
+  color: var(--cinza-texto);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.copy a {
+  color: var(--verde-mega);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transicao-rapida);
+}
+
+.copy a:hover {
+  color: var(--verde-escuro);
+  text-decoration: underline;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: var(--cinza-texto);
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+.disclaimer p {
+  margin: 0.25rem 0;
+}
+
+/* =========
+   ANIMAÇÕES
+   ========= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============
+   RESPONSIVIDADE
+   ============== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .form-control, .btn {
+    width: 100%;
+  }
+  
+  .jogo span {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.25rem;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+/* =========
+   DARK MODE
+   ========= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --branco: #1E1E1E;
+    --cinza-texto: #F0F0F0;
+    --cinza-claro: #2D2D2D;
+    --cinza-medio: #3A3A3A;
+    --cinza-border: #4A4A4A;
+    --preto: #F5F5F5;
+  }
+  
+  body {
+    background-color: #121212;
+  }
+  
+  .container {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .jogos-container, .form-control {
+    background-color: var(--cinza-medio);
+    border-color: #555;
+  }
+  
+  .form-control {
+    color: var(--cinza-texto);
+  }
+  
+  .disclaimer {
+    opacity: 0.8;
+  }
+}

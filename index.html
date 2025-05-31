@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador MS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Gerador da Sorte</h1>
+            <p class="tagline">Simulador inteligente para MS</p>
+            <div id="aviso-container" class="alert-container" role="alert" aria-live="assertive"></div>
+        </header>
+
+        <main>
+            <section class="controls" aria-labelledby="controles-titulo">
+                <h2 id="controles-titulo">Comanda</h2>
+                <div class="form-group">
+                    <label for="qtd" class="form-label">Quantidade de jogos (máx. 3)</label>
+                    <div class="input-group">
+                        <input id="qtd" type="number" min="1" max="3" value="1" 
+                               class="form-control" aria-describedby="qtd-help">
+                        <button type="button" id="gerar-jogos" class="btn btn-primary">Gerar Jogos</button>
+                        <button type="button" id="limpar" class="btn btn-secondary">Limpar Tudo</button>
+                    </div>
+                    <small id="qtd-help" class="form-text">Digite um valor entre 1 e 3</small>
+                </div>
+            </section>
+
+            <section class="results" aria-labelledby="resultados-titulo">
+                <h2 id="resultados-titulo">Seus Jogos Gerados</h2>
+                <div id="jogos" class="jogos-container" role="region" aria-live="polite"></div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="copy">
+                    &copy; <span id="year"></span> Desenvolvido por 
+                    <a href="https://www.linkedin.com/in/ribeiroarley/" target="_blank" rel="noopener noreferrer">Arley Ribeiro</a>
+                </div>
+                <div class="disclaimer">
+                    <p>Este é um projeto experimental. Não garanto ganhos na loteria.</p>
+                    <p>Os números gerados são baseados nos dados históricos da MS.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="script.js" defer></script> 
+</body>
+</html>

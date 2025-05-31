@@ -1,0 +1,1 @@
+Um gerador de jogos para a Mega-Sena que utiliza estratégias baseadas em dados históricos para sugerir combinações. Desenvolvido em HTML, CSS e JavaScript, com o auxílio de Python para extrair dados da planilha.
