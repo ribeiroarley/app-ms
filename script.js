@@ -25,8 +25,8 @@ const config = {
     numeroMaximo: 60,
     valorPadrao: 1,
     somaMinima: 100,
-    somaMaxima: 200,
-    minPares: 2,
+    somaMaxima: 215,
+    minPares: 3,
     maxPares: 4,
     alvoImpares: 4,
     minPrimos: 1,
@@ -169,10 +169,10 @@ function limpar() {
  */
 function gerarJogo(poolDisponivel) {
     let tentativas = 0;
-    const maxTentativas = 1000;
+    const maxTentativas = 5000;
     let numerosGerados = [];
     let poolAtual = [...poolDisponivel];
-    let aviso = "Jogo gerado com 4 ímpares e padrões estatísticos.";
+    let aviso = "Jogo gerado com padrões estatísticos.";
 
     while (tentativas < maxTentativas) {
         tentativas++;
