@@ -1,7 +1,7 @@
 /**
  * Gerador de Números para Mega-Sena com Estratégias Baseadas em Padrões
  * @author Arley Ribeiro
- * @version 1.2
+ * @version 1.3 (Aprimorado com Análise Estatística)
  */
 
 // Cache de elementos DOM
@@ -18,7 +18,7 @@ Object.entries(elements).forEach(([key, value]) => {
     if (!value) console.error(`Elemento com ID "${key}" não encontrado no DOM. Verifique o HTML.`);
 });
 
-// Configurações
+// Configurações baseadas em análise estatística
 const config = {
     maxJogos: 3,
     numerosPorJogo: 6,
@@ -26,13 +26,16 @@ const config = {
     valorPadrao: 1,
     somaMinima: 100,
     somaMaxima: 215,
-    minPares: 3,
-    maxPares: 4,
-    alvoImpares: 4,
+    combinacoesParImparAceitas: [
+        { pares: 3, impares: 3 }, // A mais comum
+        { pares: 2, impares: 4 }, // Segunda mais comum
+        { pares: 4, impares: 2 }  // Terceira mais comum
+    ],
     minPrimos: 1,
     maxPrimos: 3,
     minQuadrantes: 3,
     maxNumerosPorQuadrante: 3,
+    maxNumerosPorLinha: 3, // Nova regra
     maxSequencia: 2
 };
 
@@ -40,7 +43,42 @@ const config = {
 const numeroFrequencia = new Map();
 const primos = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59];
 
-// --- FUNÇÕES AUXILIARES ---
+// --- FUNÇÕES DE MAPEAMENTO DO VOLANTE ---
+
+/**
+ * Retorna a linha do volante (1 a 6) para um dado número.
+ * @param {number} n - O número da bola.
+ * @returns {number} A linha correspondente.
+ */
+function getLinha(n) {
+    return Math.floor((n - 1) / 10) + 1;
+}
+
+/**
+ * Retorna a coluna do volante (1 a 10) para um dado número.
+ * @param {number} n - O número da bola.
+ * @returns {number} A coluna correspondente.
+ */
+function getColuna(n) {
+    return ((n - 1) % 10) + 1;
+}
+
+/**
+ * Retorna o quadrante do volante (1 a 4) para um dado número.
+ * @param {number} n - O número da bola.
+ * @returns {number} O quadrante correspondente (1:SE, 2:SD, 3:IE, 4:ID).
+ */
+function getQuadrante(n) {
+    const linha = getLinha(n);
+    const coluna = getColuna(n);
+    if (linha <= 3 && coluna <= 5) return 1; // Superior Esquerdo
+    if (linha <= 3 && coluna > 5)  return 2; // Superior Direito
+    if (linha > 3 && coluna <= 5)  return 3; // Inferior Esquerdo
+    return 4; // Inferior Direito
+}
+
+
+// --- FUNÇÕES DE VALIDAÇÃO DE JOGOS ---
 
 // Conta repetições de um número
 function contarRepeticoes(numero) {
@@ -53,28 +91,41 @@ function somaValida(numeros) {
     return soma >= config.somaMinima && soma <= config.somaMaxima;
 }
 
-// Verifica proporção de pares/ímpares
+// Verifica se a proporção de pares/ímpares está entre as mais sorteadas
 function proporcaoParImparValida(numeros) {
-    const impares = numeros.filter(n => n % 2 !== 0).length;
-    return impares === config.alvoImpares; // Exige exatamente 4 ímpares (2 pares)
+    const pares = numeros.filter(n => n % 2 === 0).length;
+    const impares = config.numerosPorJogo - pares;
+    return config.combinacoesParImparAceitas.some(combinacao =>
+        combinacao.pares === pares && combinacao.impares === impares
+    );
 }
 
-// Verifica distribuição por quadrantes (01-15, 16-30, 31-45, 46-60)
+// Verifica a distribuição por quadrantes usando o mapeamento do volante real
 function quadrantesValidos(numeros) {
-    const quadrantes = [
-        numeros.filter(n => n >= 1 && n <= 15).length,
-        numeros.filter(n => n >= 16 && n <= 30).length,
-        numeros.filter(n => n >= 31 && n <= 45).length,
-        numeros.filter(n => n >= 46 && n <= 60).length
-    ];
-    const quadrantesUsados = quadrantes.filter(q => q > 0).length;
-    return quadrantesUsados >= config.minQuadrantes && quadrantes.every(q => q <= config.maxNumerosPorQuadrante);
+    const quadrantesContagem = new Map();
+    numeros.forEach(n => {
+        const q = getQuadrante(n);
+        quadrantesContagem.set(q, (quadrantesContagem.get(q) || 0) + 1);
+    });
+    const quadrantesUsados = quadrantesContagem.size;
+    const maxPorQuadrante = Math.max(0, ...quadrantesContagem.values());
+    return quadrantesUsados >= config.minQuadrantes && maxPorQuadrante <= config.maxNumerosPorQuadrante;
+}
+
+// Verifica se os números estão bem distribuídos pelas linhas
+function linhasValidas(numeros) {
+    const linhasContagem = new Map();
+    numeros.forEach(n => {
+        const l = getLinha(n);
+        linhasContagem.set(l, (linhasContagem.get(l) || 0) + 1);
+    });
+    return Math.max(0, ...linhasContagem.values()) <= config.maxNumerosPorLinha;
 }
 
 // Verifica se há sequências longas
 function semSequenciasLongas(numeros) {
     const ordenados = [...numeros].sort((a, b) => a - b);
-    for (let i = 0; i < ordenados.length - config.maxSequencia + 1; i++) {
+    for (let i = 0; i <= ordenados.length - config.maxSequencia; i++) {
         if (ordenados[i + config.maxSequencia - 1] - ordenados[i] === config.maxSequencia - 1) {
             return false;
         }
@@ -181,6 +232,7 @@ function gerarJogo(poolDisponivel) {
             somaValida(numerosGerados) &&
             proporcaoParImparValida(numerosGerados) &&
             quadrantesValidos(numerosGerados) &&
+            linhasValidas(numerosGerados) && // <-- Nova regra adicionada
             semSequenciasLongas(numerosGerados) &&
             primosValidos(numerosGerados) &&
             digitosFinaisVariados(numerosGerados)
