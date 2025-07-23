@@ -73,7 +73,9 @@ async function init() {
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
     
     await carregarDadosSorteados();
-    gerarJogos(); // Gera os jogos na primeira carga
+    
+    // A LINHA ABAIXO FOI REMOVIDA PARA NÃO GERAR JOGOS AUTOMATICAMENTE
+    // gerarJogos(); 
 }
 
 /**
@@ -86,8 +88,6 @@ function limpar() {
 
 /**
  * Tenta gerar um único jogo que passe em todas as regras de validação.
- * @param {Array<number>} pool - O conjunto de números disponíveis para o sorteio.
- * @returns {{numeros: Array<number>, aviso: string}} O jogo gerado e um aviso.
  */
 function gerarJogo(pool) {
     let tentativas = 0;
@@ -98,15 +98,12 @@ function gerarJogo(pool) {
             return { numeros: numeros.sort((a, b) => a - b), aviso: "Jogo gerado com padrões estatísticos." };
         }
     }
-    // Fallback: Se não encontrar um jogo ideal, gera com os menos frequentes.
     const numeros = pool.sort((a, b) => contarRepeticoes(a) - contarRepeticoes(b)).slice(0, config.numerosPorJogo);
     return { numeros: numeros.sort((a, b) => a - b), aviso: "Jogo gerado com números menos frequentes (fallback)." };
 }
 
 /**
  * Embaralha um array e seleciona a quantidade de números para um jogo.
- * @param {Array<number>} array - O array a ser embaralhado.
- * @returns {Array<number>} Um subconjunto do array embaralhado.
  */
 function embaralharESelecionar(array) {
     const shuffled = [...array];
@@ -119,8 +116,6 @@ function embaralharESelecionar(array) {
 
 /**
  * Exibe uma mensagem de status para o usuário.
- * @param {string} msg - A mensagem a ser exibida.
- * @param {string} tipo - O tipo de alerta ('info' ou 'erro').
  */
 function mostrarAviso(msg, tipo = "info") {
     if (elements.avisoContainer) elements.avisoContainer.innerHTML = `<div class="alert alert-${tipo}">${msg}</div>`;
@@ -142,7 +137,6 @@ function gerarJogos() {
         const resultado = gerarJogo(pool);
         jogosGerados.push(resultado.numeros);
         aviso = resultado.aviso;
-        // Garante que os números não se repitam entre os jogos gerados na mesma vez
         pool = pool.filter(n => !resultado.numeros.includes(n));
     }
     if (aviso) mostrarAviso(aviso, "info");
@@ -151,7 +145,6 @@ function gerarJogos() {
 
 /**
  * Renderiza os jogos gerados na tela.
- * @param {Array<Array<number>>} jogos - Um array contendo os jogos a serem exibidos.
  */
 function exibirJogos(jogos) {
     limpar();
