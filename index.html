@@ -18,16 +18,9 @@
 
         <main>
             <section class="controls" aria-labelledby="controles-titulo">
-                <h2 id="controles-titulo">Comanda</h2>
-                <div class="form-group">
-                    <label for="qtd" class="form-label">Quantidade de jogos (máx. 3)</label>
-                    <div class="input-group">
-                        <input id="qtd" type="number" min="1" max="3" value="1" 
-                               step="1"
-                               class="form-control" aria-describedby="qtd-help">
-                        <button type="button" id="gerar-jogos" class="btn btn-primary">Gerar Jogos</button>
-                        <button type="button" id="limpar" class="btn btn-secondary">Limpar Tudo</button>
-                    </div>
+                <h2 id="controles-titulo" class="visually-hidden">Controles</h2>
+                <div class="button-container">
+                    <button type="button" id="gerar-novos" class="btn btn-primary">Gerar Novos Jogos</button>
                 </div>
             </section>
 
