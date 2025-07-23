@@ -4,19 +4,16 @@
  * @version 2.0
  */
 
-// Cache de elementos DOM
+// ===================================================================
+// 1. CONFIGURAÇÃO INICIAL E CACHE DE ELEMENTOS
+// ===================================================================
+
 const elements = {
     jogosContainer: document.getElementById("jogos"),
     btnGerarNovos: document.getElementById("gerar-novos"),
     avisoContainer: document.getElementById("aviso-container")
 };
 
-// Verifica se todos os elementos foram encontrados
-Object.entries(elements).forEach(([key, value]) => {
-    if (!value) console.error(`Elemento com ID "${key}" não encontrado no DOM. Verifique o HTML.`);
-});
-
-// Configurações baseadas em análise estatística
 const config = {
     jogosPorVez: 3,
     numerosPorJogo: 6,
@@ -24,104 +21,92 @@ const config = {
     somaMinima: 100,
     somaMaxima: 215,
     combinacoesParImparAceitas: [
-        { pares: 3, impares: 3 },
-        { pares: 2, impares: 4 },
-        { pares: 4, impares: 2 }
+        { pares: 3, impares: 3 }, { pares: 2, impares: 4 }, { pares: 4, impares: 2 }
     ],
-    minPrimos: 1,
-    maxPrimos: 3,
-    minQuadrantes: 3,
-    maxNumerosPorQuadrante: 3,
-    maxNumerosPorLinha: 3,
-    maxSequencia: 2
+    minPrimos: 1, maxPrimos: 3,
+    minQuadrantes: 3, maxNumerosPorQuadrante: 3,
+    maxNumerosPorLinha: 3, maxSequencia: 2
 };
 
-// Map para armazenar a frequência de cada número
 const numeroFrequencia = new Map();
 const primos = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59];
 
-// --- FUNÇÕES DE MAPEAMENTO DO VOLANTE ---
+// ===================================================================
+// 2. FUNÇÕES DE MAPEAMENTO E VALIDAÇÃO DAS REGRAS
+// ===================================================================
+
 function getLinha(n) { return Math.floor((n - 1) / 10) + 1; }
 function getColuna(n) { return ((n - 1) % 10) + 1; }
 function getQuadrante(n) {
-    const linha = getLinha(n);
-    const coluna = getColuna(n);
-    if (linha <= 3 && coluna <= 5) return 1;
-    if (linha <= 3 && coluna > 5)  return 2;
-    if (linha > 3 && coluna <= 5)  return 3;
+    const l = getLinha(n), c = getColuna(n);
+    if (l <= 3 && c <= 5) return 1;
+    if (l <= 3 && c > 5) return 2;
+    if (l > 3 && c <= 5) return 3;
     return 4;
 }
+function contarRepeticoes(n) { return numeroFrequencia.get(n) || 0; }
+function somaValida(nums) { const s = nums.reduce((a, b) => a + b, 0); return s >= config.somaMinima && s <= config.somaMaxima; }
+function proporcaoParImparValida(nums) { const p = nums.filter(n => n % 2 === 0).length; return config.combinacoesParImparAceitas.some(c => c.pares === p); }
+function quadrantesValidos(nums) { const m = new Map(); nums.forEach(n => m.set(getQuadrante(n), (m.get(getQuadrante(n)) || 0) + 1)); return m.size >= config.minQuadrantes && Math.max(0, ...m.values()) <= config.maxNumerosPorQuadrante; }
+function linhasValidas(nums) { const m = new Map(); nums.forEach(n => m.set(getLinha(n), (m.get(getLinha(n)) || 0) + 1)); return Math.max(0, ...m.values()) <= config.maxNumerosPorLinha; }
+function semSequenciasLongas(nums) { const o = [...nums].sort((a, b) => a - b); for (let i = 0; i <= o.length - config.maxSequencia; i++) { if (o[i + config.maxSequencia - 1] - o[i] === config.maxSequencia - 1) return false; } return true; }
+function primosValidos(nums) { const p = nums.filter(n => primos.includes(n)).length; return p >= config.minPrimos && p <= config.maxPrimos; }
+function digitosFinaisVariados(nums) { return new Set(nums.map(n => n % 10)).size >= 4; }
 
-// --- FUNÇÕES DE VALIDAÇÃO DE JOGOS ---
-function contarRepeticoes(numero) { return numeroFrequencia.get(numero) || 0; }
-function somaValida(numeros) {
-    const soma = numeros.reduce((acc, num) => acc + num, 0);
-    return soma >= config.somaMinima && soma <= config.somaMaxima;
-}
-function proporcaoParImparValida(numeros) {
-    const pares = numeros.filter(n => n % 2 === 0).length;
-    return config.combinacoesParImparAceitas.some(c => c.pares === pares);
-}
-function quadrantesValidos(numeros) {
-    const contagem = new Map();
-    numeros.forEach(n => contagem.set(getQuadrante(n), (contagem.get(getQuadrante(n)) || 0) + 1));
-    return contagem.size >= config.minQuadrantes && Math.max(0, ...contagem.values()) <= config.maxNumerosPorQuadrante;
-}
-function linhasValidas(numeros) {
-    const contagem = new Map();
-    numeros.forEach(n => contagem.set(getLinha(n), (contagem.get(getLinha(n)) || 0) + 1));
-    return Math.max(0, ...contagem.values()) <= config.maxNumerosPorLinha;
-}
-function semSequenciasLongas(numeros) {
-    const ordenados = [...numeros].sort((a, b) => a - b);
-    for (let i = 0; i <= ordenados.length - config.maxSequencia; i++) {
-        if (ordenados[i + config.maxSequencia - 1] - ordenados[i] === config.maxSequencia - 1) return false;
-    }
-    return true;
-}
-function primosValidos(numeros) {
-    const numPrimos = numeros.filter(n => primos.includes(n)).length;
-    return numPrimos >= config.minPrimos && numPrimos <= config.maxPrimos;
-}
-function digitosFinaisVariados(numeros) {
-    return new Set(numeros.map(n => n % 10)).size >= 4;
-}
+// ===================================================================
+// 3. LÓGICA PRINCIPAL DA APLICAÇÃO
+// ===================================================================
 
-// Inicialização da aplicação
+/**
+ * Inicializa a aplicação, configura os listeners e carrega os dados.
+ */
 async function init() {
-    if (!elements.btnGerarNovos) return;
-    elements.btnGerarNovos.addEventListener('click', gerarJogos);
+    Object.entries(elements).forEach(([key, value]) => {
+        if (!value) console.error(`Elemento com ID "${key}" não encontrado no DOM.`);
+    });
+    
+    if (elements.btnGerarNovos) {
+        elements.btnGerarNovos.addEventListener('click', gerarJogos);
+    }
+    
     const yearSpan = document.getElementById("year");
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+    
     await carregarDadosSorteados();
-    gerarJogos();
+    gerarJogos(); // Gera os jogos na primeira carga
 }
 
-// Limpa os resultados e avisos
+/**
+ * Limpa a área de exibição dos jogos e os avisos.
+ */
 function limpar() {
     if (elements.jogosContainer) elements.jogosContainer.innerHTML = "";
     if (elements.avisoContainer) elements.avisoContainer.innerHTML = "";
 }
 
 /**
- * Gera um único jogo com base nas estratégias de padrões
+ * Tenta gerar um único jogo que passe em todas as regras de validação.
+ * @param {Array<number>} pool - O conjunto de números disponíveis para o sorteio.
+ * @returns {{numeros: Array<number>, aviso: string}} O jogo gerado e um aviso.
  */
-function gerarJogo(poolDisponivel) {
+function gerarJogo(pool) {
     let tentativas = 0;
-    const maxTentativas = 5000;
-    while (tentativas < maxTentativas) {
+    while (tentativas < 5000) {
         tentativas++;
-        const numerosGerados = embaralharESelecionar(poolDisponivel);
-        if (somaValida(numerosGerados) && proporcaoParImparValida(numerosGerados) && quadrantesValidos(numerosGerados) && linhasValidas(numerosGerados) && semSequenciasLongas(numerosGerados) && primosValidos(numerosGerados) && digitosFinaisVariados(numerosGerados)) {
-            return { numeros: numerosGerados.sort((a, b) => a - b), aviso: "Jogo gerado com padrões estatísticos." };
+        const numeros = embaralharESelecionar(pool);
+        if (somaValida(numeros) && proporcaoParImparValida(numeros) && quadrantesValidos(numeros) && linhasValidas(numeros) && semSequenciasLongas(numeros) && primosValidos(numeros) && digitosFinaisVariados(numeros)) {
+            return { numeros: numeros.sort((a, b) => a - b), aviso: "Jogo gerado com padrões estatísticos." };
         }
     }
-    const numerosGerados = poolDisponivel.sort((a, b) => contarRepeticoes(a) - contarRepeticoes(b)).slice(0, config.numerosPorJogo);
-    return { numeros: numerosGerados.sort((a, b) => a - b), aviso: "Jogo gerado com números menos frequentes (fallback)." };
+    // Fallback: Se não encontrar um jogo ideal, gera com os menos frequentes.
+    const numeros = pool.sort((a, b) => contarRepeticoes(a) - contarRepeticoes(b)).slice(0, config.numerosPorJogo);
+    return { numeros: numeros.sort((a, b) => a - b), aviso: "Jogo gerado com números menos frequentes (fallback)." };
 }
 
 /**
- * Embaralha e seleciona números usando Fisher-Yates
+ * Embaralha um array e seleciona a quantidade de números para um jogo.
+ * @param {Array<number>} array - O array a ser embaralhado.
+ * @returns {Array<number>} Um subconjunto do array embaralhado.
  */
 function embaralharESelecionar(array) {
     const shuffled = [...array];
@@ -132,35 +117,42 @@ function embaralharESelecionar(array) {
     return shuffled.slice(0, config.numerosPorJogo);
 }
 
-// Mostra mensagens de aviso ou erro
-function mostrarAviso(mensagem, tipo = "info") {
-    if (elements.avisoContainer) elements.avisoContainer.innerHTML = `<div class="alert alert-${tipo}">${mensagem}</div>`;
+/**
+ * Exibe uma mensagem de status para o usuário.
+ * @param {string} msg - A mensagem a ser exibida.
+ * @param {string} tipo - O tipo de alerta ('info' ou 'erro').
+ */
+function mostrarAviso(msg, tipo = "info") {
+    if (elements.avisoContainer) elements.avisoContainer.innerHTML = `<div class="alert alert-${tipo}">${msg}</div>`;
 }
 
 /**
- * Gera um conjunto fixo de jogos, garantindo unicidade
+ * Orquestra a geração de um conjunto completo de jogos.
  */
 function gerarJogos() {
     console.log("Gerando novo conjunto de jogos...");
-    const qtdJogos = config.jogosPorVez;
-    let avisoGlobal = "";
+    let pool = Array.from({ length: config.numeroMaximo }, (_, i) => i + 1);
     const jogosGerados = [];
-    let poolAtual = Array.from({ length: config.numeroMaximo }, (_, i) => i + 1);
-    for (let i = 0; i < qtdJogos; i++) {
-        if (poolAtual.length < config.numerosPorJogo) {
-            mostrarAviso(`Não há números suficientes no pool para gerar o jogo ${i + 1}.`, "aviso");
+    let aviso = "";
+    for (let i = 0; i < config.jogosPorVez; i++) {
+        if (pool.length < config.numerosPorJogo) {
+            mostrarAviso(`Não há números suficientes para gerar o jogo ${i + 1}.`, "aviso");
             break;
         }
-        const { numeros, aviso } = gerarJogo(poolAtual);
-        avisoGlobal = aviso;
-        jogosGerados.push(numeros);
-        poolAtual = poolAtual.filter(n => !numeros.includes(n));
+        const resultado = gerarJogo(pool);
+        jogosGerados.push(resultado.numeros);
+        aviso = resultado.aviso;
+        // Garante que os números não se repitam entre os jogos gerados na mesma vez
+        pool = pool.filter(n => !resultado.numeros.includes(n));
     }
-    if (avisoGlobal) mostrarAviso(avisoGlobal, "info");
+    if (aviso) mostrarAviso(aviso, "info");
     exibirJogos(jogosGerados);
 }
 
-// Exibe os jogos gerados
+/**
+ * Renderiza os jogos gerados na tela.
+ * @param {Array<Array<number>>} jogos - Um array contendo os jogos a serem exibidos.
+ */
 function exibirJogos(jogos) {
     limpar();
     const fragment = document.createDocumentFragment();
@@ -170,45 +162,42 @@ function exibirJogos(jogos) {
         const indicador = document.createElement("i");
         indicador.textContent = `${index + 1}.`;
         divJogo.appendChild(indicador);
-        jogo.forEach(numero => {
+        jogo.forEach(n => {
             const bola = document.createElement("span");
-            bola.textContent = String(numero).padStart(2, '0');
-            const frequencia = contarRepeticoes(numero);
-
-            // --- AJUSTE REALIZADO AQUI ---
-            // Adiciona a classe CSS correta para a cor da bola
-            if (frequencia > 0) {
+            bola.textContent = String(n).padStart(2, '0');
+            const freq = contarRepeticoes(n);
+            if (freq > 0) {
                 bola.classList.add("sorteado");
-                bola.title = `Sorteado ${frequencia} vez(es).`;
+                bola.title = `Sorteado ${freq} vez(es).`;
             } else {
                 bola.classList.add("nao-sorteado");
                 bola.title = "Nunca sorteado.";
             }
-            
             divJogo.appendChild(bola);
         });
         fragment.appendChild(divJogo);
     });
-    elements.jogosContainer.appendChild(fragment);
+    if (elements.jogosContainer) elements.jogosContainer.appendChild(fragment);
 }
 
 /**
- * Carrega os dados dos números sorteados
+ * Carrega os dados históricos dos sorteios do arquivo JSON.
  */
 async function carregarDadosSorteados() {
     try {
-        const response = await fetch('./data/sorteios_mega_sena.json');
-        if (!response.ok) throw new Error(`Erro HTTP! Status: ${response.status}`);
-        const concursos = await response.json();
-        concursos.forEach(sorteio => sorteio.forEach(numero => {
-            numeroFrequencia.set(numero, (numeroFrequencia.get(numero) || 0) + 1);
-        }));
-        console.log(`Dados de ${concursos.length} sorteios carregados.`);
+        const res = await fetch('./data/sorteios_mega_sena.json');
+        if (!res.ok) throw new Error(`Erro HTTP! Status: ${res.status}`);
+        const data = await res.json();
+        data.forEach(s => s.forEach(n => numeroFrequencia.set(n, (numeroFrequencia.get(n) || 0) + 1)));
+        console.log(`Dados de ${data.length} sorteios carregados.`);
     } catch (error) {
-        console.error("Erro ao carregar dados sorteados:", error);
-        mostrarAviso(`Erro ao carregar dados históricos. A geração pode não ser otimizada.`, "erro");
+        console.error("Erro ao carregar dados dos sorteios:", error);
+        mostrarAviso(`Erro ao carregar dados históricos.`, "erro");
     }
 }
 
-// Inicia a aplicação
+// ===================================================================
+// 4. INICIALIZAÇÃO DA APLICAÇÃO
+// ===================================================================
+
 document.addEventListener('DOMContentLoaded', init);
