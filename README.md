@@ -1,1 +1,7 @@
-Um gerador de jogos para a Mega-Sena que utiliza estratégias baseadas em dados históricos para sugerir combinações. Desenvolvido em HTML, CSS e JavaScript, com o auxílio de Python para extrair dados da planilha.
+## 📖 Sobre o Projeto
+
+Este projeto é uma aplicação web que gera sugestões de jogos para a Mega-Sena baseada em **análise estatística** de todos os sorteios históricos.
+
+Diferente de geradores aleatórios comuns, este algoritmo utiliza uma lógica "Sniper" calibrada com a Curva de Gauss e padrões de frequência para sugerir combinações matematicamente equilibradas.
+
+**Desenvolvido por Arley Ribeiro**
