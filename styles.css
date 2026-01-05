@@ -1,0 +1,540 @@
+/* =================================
+   1. VARIÁVEIS E TEMA (Casino Luxury)
+   ================================= */
+:root {
+  /* Cores do Ambiente */
+  --bg-mesa: #0b3d28;
+  --bg-mesa-gradient: radial-gradient(circle at center, #135e3f, #052416);
+  --papel-bilhete: #fdfbf7;
+  
+  /* Metais e Acabamentos */
+  --dourado-luxo: #d4af37;
+  --dourado-brilho: #fadd75;
+  --dourado-escuro: #aa8c2c;
+  
+  /* Textos */
+  --branco: #ffffff;
+  --preto-fosco: #222222;
+  --cinza-texto: #555555;
+
+  /* Cores das Bolas (Estilo 3D) */
+  --bola-verde-base: #209869;
+  --bola-verde-brilho: #4cdba3;
+  --bola-verde-borda: #176e4d;
+  
+  --bola-laranja-base: #e67e22;
+  --bola-laranja-brilho: #f39c12;
+  --bola-laranja-borda: #d35400;
+
+  /* UI e Sombras */
+  --sombra-card: 0 15px 35px rgba(0, 0, 0, 0.4);
+  --sombra-bola: 1px 3px 8px rgba(0, 0, 0, 0.4);
+  --borda-dourada: 4px solid var(--dourado-luxo);
+  --radius: 16px;
+  --radius-pequeno: 12px;
+  --transition: all 0.3s ease;
+}
+
+/* ====================
+   2. RESET E ESTRUTURA
+   ==================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-mesa);
+  background-image: var(--bg-mesa-gradient);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--preto-fosco);
+  padding: 1.5rem 1rem;
+  line-height: 1.5;
+}
+
+/* ====================
+   3. UTILITÁRIOS (Acessibilidade & UI)
+   ==================== */
+/* Esconde texto visualmente mas mantém para leitores de tela */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Classe para alternar visibilidade via JS */
+.hidden {
+  display: none !important;
+}
+
+/* ====================
+   4. CARD PRINCIPAL (O Bilhete)
+   ==================== */
+.main-wrapper {
+  width: 100%;
+  max-width: 640px;
+  padding: 0 1rem;
+}
+
+.container {
+  width: 100%;
+  background: var(--papel-bilhete);
+  border: var(--borda-dourada);
+  border-radius: var(--radius);
+  box-shadow: 
+    0 0 0 6px rgba(0,0,0,0.6), /* Borda escura externa */
+    var(--sombra-card);
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito de borda dourada brilhante no topo */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: linear-gradient(90deg, 
+    var(--dourado-escuro), 
+    var(--dourado-brilho) 30%, 
+    var(--dourado-luxo) 50%, 
+    var(--dourado-brilho) 70%, 
+    var(--dourado-escuro));
+  z-index: 2;
+}
+
+/* Detalhe de recorte central no topo */
+.container::after {
+  content: '';
+  position: absolute;
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 20px;
+  background: var(--bg-mesa);
+  border: 6px solid var(--papel-bilhete);
+  border-top: none;
+  border-radius: 0 0 30px 30px;
+  box-shadow: inset 0 4px 6px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Garante que o conteúdo fique acima dos detalhes de fundo */
+.container > * {
+  position: relative;
+  z-index: 5;
+}
+
+/* ====================
+   5. CABEÇALHO
+   ==================== */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+  color: var(--dourado-luxo);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  display: inline-block;
+  transition: transform 0.6s ease;
+}
+
+/* Efeito giratório no trevo */
+.logo-area:hover .spin-hover {
+  transform: rotate(360deg);
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem); /* Responsivo */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  /* Gradiente no Texto */
+  background: linear-gradient(45deg, #209869, #0e5c3c, #209869);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; 
+}
+
+.tagline {
+  color: var(--cinza-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ====================
+   6. CONTROLES E INPUTS
+   ==================== */
+.controls {
+  margin-bottom: 2rem;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f4f4f4;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  border: 1px solid #ddd;
+}
+
+.input-group label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #444;
+  text-transform: uppercase;
+}
+
+.input-number {
+  width: 60px;
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid var(--dourado-escuro);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--preto-fosco);
+  outline: none;
+  transition: var(--transition);
+}
+
+.input-number:focus {
+  border-color: var(--bola-verde-base);
+  box-shadow: 0 0 0 3px rgba(32, 152, 105, 0.2);
+}
+
+/* ====================
+   7. BOTÃO CASINO
+   ==================== */
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-casino {
+  position: relative;
+  /* Gradiente Dourado Vertical */
+  background: linear-gradient(180deg, 
+    var(--dourado-brilho) 0%, 
+    var(--dourado-luxo) 50%, 
+    var(--dourado-escuro) 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  overflow: hidden;
+  /* Sombra sólida para dar profundidade */
+  box-shadow: 
+    0 6px 0 #8a6d1c,
+    0 12px 20px rgba(0,0,0,0.3);
+  transition: var(--transition);
+  
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #3e2b02;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-casino:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 0 #8a6d1c,
+    0 16px 25px rgba(0,0,0,0.4);
+}
+
+.btn-casino:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #8a6d1c;
+}
+
+.btn-casino:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Brilho animado que passa pelo botão */
+.btn-shine {
+  position: absolute;
+  top: 0; left: -150%;
+  width: 60%; height: 100%;
+  background: linear-gradient(120deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.1) 40%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0.1) 60%,
+    transparent 100%);
+  transform: skewX(-25deg);
+  animation: shine 4s infinite ease-in-out;
+}
+
+@keyframes shine {
+  0% { left: -150%; }
+  20% { left: 150%; }
+  100% { left: 150%; }
+}
+
+/* Spinner (Loading) */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(62, 43, 2, 0.3);
+  border-top-color: #3e2b02;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ====================
+   8. RESULTADOS E BOLAS
+   ==================== */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed #ddd;
+}
+
+.results h2 {
+  font-size: 1rem;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.btn-text-only {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-text-only:hover {
+  color: var(--bola-laranja-borda);
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 2rem 0;
+  background: #f9f9f9;
+  border-radius: var(--radius-pequeno);
+}
+
+.jogos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Cartão Individual de Jogo */
+.jogo {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-left: 6px solid var(--bola-verde-base);
+  border-radius: var(--radius-pequeno);
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  
+  /* Animação de entrada */
+  animation: slideIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.jogo i {
+  font-style: normal;
+  font-weight: 900;
+  color: #ccc;
+  font-size: 0.9rem;
+  min-width: 25px;
+}
+
+/* Bolas 3D */
+.jogo span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+  
+  /* Efeito de Esfera */
+  box-shadow: 
+    inset -3px -3px 8px rgba(0,0,0,0.2),
+    inset 3px 3px 8px rgba(255,255,255,0.3),
+    0 4px 8px var(--sombra-bola);
+  transition: transform 0.2s ease;
+  flex: 0 0 auto;
+  cursor: default;
+}
+
+.jogo span:hover {
+  transform: scale(1.15) translateY(-2px);
+  z-index: 10;
+}
+
+/* Variações de cor das bolas */
+.sorteado {
+  background: radial-gradient(circle at 35% 35%, 
+    var(--bola-verde-brilho), 
+    var(--bola-verde-base) 70%);
+  border: 1px solid var(--bola-verde-borda);
+}
+
+.nao-sorteado {
+  background: radial-gradient(circle at 35% 35%, 
+    var(--bola-laranja-brilho), 
+    var(--bola-laranja-base) 70%);
+  border: 1px solid var(--bola-laranja-borda);
+}
+
+/* ====================
+   9. NOTIFICAÇÕES (Alerts)
+   ==================== */
+.alert-container-fixed {
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 90%;
+  max-width: 500px;
+}
+
+.alert-container {
+  margin-top: 1rem;
+  min-height: 20px;
+}
+
+.alert {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-pequeno);
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 600;
+  animation: fadeIn 0.4s ease;
+  margin-bottom: 0.5rem;
+}
+
+.alert-info { background: #e8f5e8; color: #1b5e20; border: 1px solid #c8e6c9; }
+.alert-erro { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+/* ====================
+   10. RODAPÉ
+   ==================== */
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 2px dashed #e0e0e0;
+}
+
+.copy { font-size: 0.85rem; color: #666; }
+.copy a { color: var(--bola-verde-base); text-decoration: none; font-weight: 700; }
+.copy a:hover { text-decoration: underline; }
+
+.disclaimer {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: #999;
+  line-height: 1.4;
+}
+
+/* ====================
+   11. ANIMAÇÕES GERAIS
+   ==================== */
+@keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ====================
+   12. RESPONSIVIDADE
+   ==================== */
+@media (min-width: 600px) {
+  /* Layout Lado a Lado em telas maiores */
+  .control-panel {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .input-group { flex: 0 0 auto; }
+  .button-container { flex: 1; justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+  /* Ajustes para Celular */
+  .container { padding: 1.5rem 1rem; }
+  h1 { font-size: 1.8rem; }
+  
+  .input-group { width: 100%; justify-content: space-between; }
+  
+  .jogo span {
+    width: 38px; height: 38px;
+    font-size: 1rem;
+  }
+  
+  .jogo { justify-content: center; padding: 1rem; }
+}
